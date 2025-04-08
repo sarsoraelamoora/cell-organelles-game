@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cell Organelles Matching Game</title>
+  <style>
+    body {
+      font-family: 'Century Gothic', sans-serif;
+      background-color: #fceef5;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #6a5acd;
+    }
+    .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    #organelle-list {
+      width: 20%;
+      background-color: #f8e1e7;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    #organelle-title {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .card {
+      border: 2px dashed #aaa;
+      border-radius: 8px;
+      padding: 5px;
+      margin: 8px 0;
+      background-color: #fff0f5;
+      cursor: move;
+      min-height: 30px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .descriptions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 75%;
+    }
+    .dropzone {
+      border: 2px dashed #999;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 60px;
+      background-color: #e0f7fa;
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+    }
+    .dragging {
+      opacity: 0.5;
+    }
+    .correct {
+      background-color: #d0f0c0 !important;
+    }
+    .incorrect {
+      background-color: #ffb6b9 !important;
+    }
+    #check-button, #reset-button, #shuffle-button {
+      display: inline-block;
+      margin: 30px 10px 0 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #b39ddb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Drag and Drop: Match the Organelle to Its Description</h1>
+  <div class="container">
+    <div id="organelle-list">
+      <div id="organelle-title">Organelles</div>
+      <div class="card" draggable="true">Nucleus</div>
+      <div class="card" draggable="true">Mitochondria</div>
+      <div class="card" draggable="true">Ribosome</div>
+      <div class="card" draggable="true">Cell Membrane</div>
+      <div class="card" draggable="true">Chloroplast</div>
+      <div class="card" draggable="true">Cell Wall</div>
+      <div class="card" draggable="true">Golgi Apparatus</div>
+      <div class="card" draggable="true">Endoplasmic Reticulum</div>
+      <div class="card" draggable="true">Vacuole</div>
+      <div class="card" draggable="true">Cytoskeleton</div>
+      <div class="card" draggable="true">Cytoplasm</div>
+    </div>
+    <div class="descriptions">
+      <div class="dropzone" data-answer="Nucleus">The "brain" of the cell that holds the DNA.</div>
+      <div class="dropzone" data-answer="Mitochondria">The part that makes energy from oxygen and sugar.</div>
+      <div class="dropzone" data-answer="Ribosome">Makes proteins and floats in the cell or sticks to the endoplasmic reticulum.</div>
+      <div class="dropzone" data-answer="Cell Membrane">A thin layer that controls what goes in and out of the cell.</div>
+      <div class="dropzone" data-answer="Chloroplast">Uses sunlight to make food for plants. Makes the plant green.</div>
+      <div class="dropzone" data-answer="Cell Wall">Hard outer wall that gives plant cells their shape.</div>
+      <div class="dropzone" data-answer="Golgi Apparatus">Packs and ships proteins, like a post office.</div>
+      <div class="dropzone" data-answer="Endoplasmic Reticulum">A factory that makes and stores proteins.</div>
+      <div class="dropzone" data-answer="Vacuole">Stores water, food, and waste. Plants have one big one.</div>
+      <div class="dropzone" data-answer="Cytoskeleton">A frame that helps the cell keep its shape.</div>
+      <div class="dropzone" data-answer="Cytoplasm">Jelly-like filling that holds everything inside the cell.</div>
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <button id="check-button">Check Answers</button>
+    <button id="reset-button">Reset</button>
+    <button id="shuffle-button">Shuffle</button>
+  </div>
+
+  <script>
+    const cards = document.querySelectorAll('.card');
+    const dropzones = document.querySelectorAll('.dropzone');
+    const organelleList = document.getElementById('organelle-list');
+    const organelleTitle = document.getElementById('organelle-title');
+
+    cards.forEach(card => {
+      card.addEventListener('dragstart', () => {
+        card.classList.add('dragging');
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+      });
+    });
+
+    dropzones.forEach(zone => {
+      zone.addEventListener('dragover', e => {
+        e.preventDefault();
+        const draggingCard = document.querySelector('.dragging');
+        if (draggingCard && !zone.querySelector('.card')) {
+          zone.appendChild(draggingCard);
+        }
+      });
+    });
+
+    organelleList.addEventListener('dragover', e => {
+      e.preventDefault();
+      const draggingCard = document.querySelector('.dragging');
+      if (draggingCard && draggingCard.parentElement !== organelleList) {
+        organelleList.appendChild(draggingCard);
+      }
+    });
+
+    document.getElementById('check-button').addEventListener('click', () => {
+      dropzones.forEach(zone => {
+        const card = zone.querySelector('.card');
+        zone.classList.remove('correct', 'incorrect');
+        if (card) {
+          if (card.textContent.trim() === zone.dataset.answer) {
+            zone.classList.add('correct');
+          } else {
+            zone.classList.add('incorrect');
+          }
+        }
+      });
+    });
+
+    document.getElementById('reset-button').addEventListener('click', () => {
+      dropzones.forEach(zone => {
+        const card = zone.querySelector('.card');
+        if (card) {
+          organelleList.appendChild(card);
+        }
+        zone.classList.remove('correct', 'incorrect');
+      });
+    });
+
+    function shuffleElements(container) {
+      const elements = Array.from(container.children).filter(el => el !== organelleTitle);
+      elements.sort(() => Math.random() - 0.5);
+      elements.forEach(el => container.appendChild(el));
+    }
+
+    document.getElementById('shuffle-button').addEventListener('click', () => {
+      dropzones.forEach(zone => {
+        const card = zone.querySelector('.card');
+        if (card) {
+          organelleList.appendChild(card);
+        }
+        zone.classList.remove('correct', 'incorrect');
+      });
+
+      shuffleElements(organelleList);
+      const descriptionsContainer = document.querySelector('.descriptions');
+      shuffleElements(descriptionsContainer);
+    });
+  </script>
+</body>
+</html>
